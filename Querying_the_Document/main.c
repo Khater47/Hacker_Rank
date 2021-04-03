@@ -5,6 +5,7 @@
 #define MAX_CHARACTERS 1005
 #define MAX_PARAGRAPHS 5
 
+FILE *fp = NULL;
 
 //my util variables
 typedef struct{
@@ -23,15 +24,15 @@ void check_null(void *pointer){
 }
 
 char* kth_word_in_mth_sentence_of_nth_paragraph(char**** document, int k, int m, int n) {
-    return document[n][m][k];
+    return document[n-1][m-1][k-1];
 }
 
 char** kth_sentence_in_mth_paragraph(char**** document, int k, int m) { 
-    return document[m][k];
+    return document[m-1][k-1];
 }
 
 char*** kth_paragraph(char**** document, int k) {
-    return document[k];
+    return document[k-1];
 }
 
 char**** get_document(char* text) {
@@ -58,7 +59,7 @@ char**** get_document(char* text) {
         character++;
     }
     //initialize word_num_in_sentences
-    for(i = 0; i < 5; i++){
+    for(i = 0; i < MAX_PARAGRAPHS && meta_data[i].sentences_num != 0; i++){
         meta_data[i].words_num_in_sentences = (int *)malloc(meta_data[i].sentences_num * sizeof(int));
         check_null((void *)meta_data[i].words_num_in_sentences);
         for(k = 0; k < meta_data[i].sentences_num; k++){
@@ -90,7 +91,7 @@ char**** get_document(char* text) {
         document[paragraph] = (char ***)malloc(meta_data[paragraph].sentences_num * sizeof(char **));
         check_null((void *)document[paragraph]);
         for(sentence = 0; sentence < meta_data[paragraph].sentences_num; sentence++){
-            document[paragraph][sentence] = (char **)malloc(meta_data[paragraph].words_num_in_sentences[sentence] * sizeof(char));
+            document[paragraph][sentence] = (char **)malloc(meta_data[paragraph].words_num_in_sentences[sentence] * sizeof(char *));
             check_null((void *)document[paragraph][sentence]);
         }
     }
@@ -99,14 +100,17 @@ char**** get_document(char* text) {
     paragraph = sentence = word = character = 0; 
     for(i = 0; i < strlen(text); i++){
         if(text[i] != ' ' && text[i] != '.' && text[i] != '\n'){
-            buffer[character++] = text[i]; 
+            buffer[character] = text[i];
+            character++; 
         }else if(text[i] == ' '){
             buffer[character] = '\0';
-            document[paragraph][sentence][word++] = strdup(buffer);
+            document[paragraph][sentence][word] = strdup(buffer);
+            word++;
             character = 0;
         }else if(text[i] == '.'){
             buffer[character] = '\0';
-            document[paragraph][sentence++][word] = strdup(buffer);
+            document[paragraph][sentence][word] = strdup(buffer);
+            sentence++;
             word = character = 0;
         }else if(text[i] == '\n'){
             paragraph++;
@@ -117,15 +121,17 @@ char**** get_document(char* text) {
 }
 
 
-char* get_input_text() {	
-    int paragraph_count;
-    scanf("%d", &paragraph_count);
+char* get_input_text() {
 
-    char p[MAX_PARAGRAPHS][MAX_CHARACTERS], doc[MAX_CHARACTERS];
+    int paragraph_count;
+    fscanf(fp, "%d%*c", &paragraph_count);
+
+    char p[MAX_PARAGRAPHS][MAX_CHARACTERS], doc[MAX_CHARACTERS+1];
+
     memset(doc, 0, sizeof(doc));
-    getchar();
+    //getchar();
     for (int i = 0; i < paragraph_count; i++) {
-        scanf("%[^\n]%*c", p[i]);
+        fscanf(fp, "%[^\n]%*c", p[i]);
         strcat(doc, p[i]);
         if (i != paragraph_count - 1)
             strcat(doc, "\n");
@@ -133,6 +139,7 @@ char* get_input_text() {
 
     char* returnDoc = (char*)malloc((strlen (doc)+1) * (sizeof(char)));
     strcpy(returnDoc, doc);
+
     return returnDoc;
 }
 
@@ -142,7 +149,7 @@ void print_word(char* word) {
 
 void print_sentence(char** sentence) {
     int word_count;
-    scanf("%d", &word_count);
+    fscanf(fp, "%d%*c", &word_count);
     for(int i = 0; i < word_count; i++){
         printf("%s", sentence[i]);
         if( i != word_count - 1)
@@ -152,7 +159,7 @@ void print_sentence(char** sentence) {
 
 void print_paragraph(char*** paragraph) {
     int sentence_count;
-    scanf("%d", &sentence_count);
+    fscanf(fp, "%d%*c", &sentence_count);
     for (int i = 0; i < sentence_count; i++) {
         print_sentence(*(paragraph + i));
         printf(".");
@@ -161,36 +168,45 @@ void print_paragraph(char*** paragraph) {
 
 int main() 
 {
+    int k, m, n, type, q;
+    fp = fopen("/home/axe47/C C++/Hacker_Rank/Querying_the_Document/input.txt", "r");
+    if(fp == NULL){
+        printf("file open error\n");
+        exit(0);
+    }
+
     char* text = get_input_text();
+
     char**** document = get_document(text);
 
-    int q;
-    scanf("%d", &q);
+    
+    fscanf(fp, "%d%*c", &q);
 
     while (q--) {
-        int type;
-        scanf("%d", &type);
+        
+        fscanf(fp, "%d", &type);
 
         if (type == 3){
-            int k, m, n;
-            scanf("%d %d %d", &k, &m, &n);
+            
+            fscanf(fp, "%d %d %d%*c", &k, &m, &n);
             char* word = kth_word_in_mth_sentence_of_nth_paragraph(document, k, m, n);
             print_word(word);
         }
 
         else if (type == 2){
-            int k, m;
-            scanf("%d %d", &k, &m);
+            
+            fscanf(fp, "%d %d%*c", &k, &m);
             char** sentence = kth_sentence_in_mth_paragraph(document, k, m);
             print_sentence(sentence);
         }
 
         else{
-            int k;
-            scanf("%d", &k);
+            
+            fscanf(fp, "%d%*c", &k);
             char*** paragraph = kth_paragraph(document, k);
             print_paragraph(paragraph);
         }
         printf("\n");
-    }     
+    }
+    fclose(fp);     
 }
