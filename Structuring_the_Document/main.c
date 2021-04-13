@@ -5,6 +5,10 @@
 #define MAX_CHARACTERS 1005
 #define MAX_PARAGRAPHS 5
 
+
+/*
+    Data structures and global variables
+*/
 FILE *fp;
 
 struct word {
@@ -25,23 +29,30 @@ struct document {
     struct paragraph* data;
     int paragraph_count;//denotes number of paragraphs in a document
 };
+
+/*
+    functions definitions
+*/
 struct document get_document(char* text) {
     
 }
 
 struct word kth_word_in_mth_sentence_of_nth_paragraph(struct document Doc, int k, int m, int n) {
-
+    return Doc.data[n-1].data[m-1].data[k-1];
 }
 
 struct sentence kth_sentence_in_mth_paragraph(struct document Doc, int k, int m) { 
-
+    return Doc.data[m-1].data[k-1];
 }
 
 struct paragraph kth_paragraph(struct document Doc, int k) {
-
+    return Doc.data[k-1];
 }
 
 
+/*
+    Given functions
+*/
 void print_word(struct word w) {
     printf("%s", w.data);
 }
@@ -89,6 +100,9 @@ char* get_input_text() {
     return returnDoc;
 }
 
+/*
+    main
+*/
 int main() 
 {
     char* text = get_input_text();
@@ -129,5 +143,6 @@ int main()
         }
         printf("\n");
     }
+    fclose(fp);
     return 0;     
 }
