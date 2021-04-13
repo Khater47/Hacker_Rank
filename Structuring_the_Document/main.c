@@ -5,6 +5,8 @@
 #define MAX_CHARACTERS 1005
 #define MAX_PARAGRAPHS 5
 
+FILE *fp;
+
 struct word {
     char* data;
 };
@@ -24,7 +26,7 @@ struct document {
     int paragraph_count;//denotes number of paragraphs in a document
 };
 struct document get_document(char* text) {
-
+    
 }
 
 struct word kth_word_in_mth_sentence_of_nth_paragraph(struct document Doc, int k, int m, int n) {
@@ -70,13 +72,13 @@ void print_document(struct document doc) {
 
 char* get_input_text() {	
     int paragraph_count;
-    scanf("%d", &paragraph_count);
+    fscanf(fp, "%d", &paragraph_count);
 
     char p[MAX_PARAGRAPHS][MAX_CHARACTERS], doc[MAX_CHARACTERS];
     memset(doc, 0, sizeof(doc));
     getchar();
     for (int i = 0; i < paragraph_count; i++) {
-        scanf("%[^\n]%*c", p[i]);
+        fscanf(fp, "%[^\n]%*c", p[i]);
         strcat(doc, p[i]);
         if (i != paragraph_count - 1)
             strcat(doc, "\n");
@@ -92,30 +94,36 @@ int main()
     char* text = get_input_text();
     struct document Doc = get_document(text);
 
+    fp = fopen("/home/axe47/C C++/Hacker_Rank/Structuring_the_Document/input.txt", "r");
+    if (fp == NULL){
+        printf("File error\n");
+        exit(1);
+    }
+
     int q;
-    scanf("%d", &q);
+    fscanf(fp, "%d", &q);
 
     while (q--) {
         int type;
-        scanf("%d", &type);
+        fscanf(fp, "%d", &type);
 
         if (type == 3){
             int k, m, n;
-            scanf("%d %d %d", &k, &m, &n);
+            fscanf(fp, "%d %d %d", &k, &m, &n);
             struct word w = kth_word_in_mth_sentence_of_nth_paragraph(Doc, k, m, n);
             print_word(w);
         }
 
         else if (type == 2) {
             int k, m;
-            scanf("%d %d", &k, &m);
+            fscanf(fp, "%d %d", &k, &m);
             struct sentence sen= kth_sentence_in_mth_paragraph(Doc, k, m);
             print_sentence(sen);
         }
 
         else{
             int k;
-            scanf("%d", &k);
+            fscanf(fp, "%d", &k);
             struct paragraph para = kth_paragraph(Doc, k);
             print_paragraph(para);
         }
