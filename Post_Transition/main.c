@@ -70,6 +70,9 @@ void send_all_acceptable_packages(town* source, int source_office_index, town* t
 			mark[i] = 0;
 		}
 	}
+	if(accepted_packages == 0){
+		return;
+	}
 	// reallocate memory to add accepted packages to target
 	new_size = target_office->packages_count + accepted_packages;
 	target_office->packages = (package *) realloc(target_office->packages, (new_size * sizeof(package)));
@@ -78,10 +81,10 @@ void send_all_acceptable_packages(town* source, int source_office_index, town* t
 		exit(1);
 	}
 	//move accepted packages to target with the same order
+	pos = target_office->packages_count;
 	for(i = 0; i < source_office->packages_count; i++){
 		if(mark[i] == 1){
 			//copy package of index i from source to target in pos after target_office->package_count
-			pos = ++(target_office->packages_count);
 			target_office->packages[pos].weight = source_office->packages[i].weight;
 			target_office->packages[pos].id = (char *)malloc(MAX_STRING_LENGTH * sizeof(char));
 			if(target_office->packages[pos].id == NULL){
@@ -89,8 +92,10 @@ void send_all_acceptable_packages(town* source, int source_office_index, town* t
 				exit(1);
 			}
 			strcpy(target_office->packages[pos].id, source_office->packages[i].id);
+			pos++;
 		}
 	}
+	target_office->packages_count += accepted_packages;
 	//modify source packages
 	new_size = source_office->packages_count - accepted_packages;
 	temp = (package *)malloc(new_size * sizeof(package));
