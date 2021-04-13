@@ -49,9 +49,38 @@ void send_all_acceptable_packages(town* source, int source_office_index, town* t
 }
 
 town town_with_most_packages(town* towns, int towns_count) {
+	int *packages_count = (int *)malloc(towns_count * sizeof(int));
+	int i, j, max, max_index;
+	
+	if(packages_count == NULL){
+		printf("Memory alloction error\n");
+		exit(1);
+	}
+	for(i = 0; i < towns_count; i++){
+		packages_count[i] = 0;
+		for(j = 0; j < towns[i].offices_count; j++){
+			packages_count[i] += towns[i].offices[j].packages_count;
+		}
+	}
+	max_index = 0;
+	max = packages_count[0];
+	for(i = 0; i < towns_count; i++){
+		if(packages_count[i] > max){
+			max = packages_count[i];
+			max_index = i;
+		}
+	}
+	return towns[max_index];
 }
 
 town* find_town(town* towns, int towns_count, char* name) {
+	int i;
+	for(i = 0; i < towns_count; i++){
+		if(strcmp(towns[i].name, name) == 0){
+			return &towns[i];
+		}
+	}
+	return NULL;
 }
 
 int main()
