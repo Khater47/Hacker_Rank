@@ -53,3 +53,4 @@ dkms.conf
 
 # input test files
 *.txt
+*.pdf
